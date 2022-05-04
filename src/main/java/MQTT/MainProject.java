@@ -17,6 +17,8 @@ class Main extends JFrame{
 		setTitle("Main Application");
 		setBounds(800,300,900,400);
 		
+		System.out.println(" Istoric commit - Update ");
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setBackground((new Color(100,200,225)));
 		
