@@ -1,6 +1,8 @@
 package MQTT;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -8,13 +10,12 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-
-class logInInterface extends JFrame{
+/*
+class LogInInterface extends JFrame{
 	
-
 	private static final long serialVersionUID = 1L;
 	
-	logInInterface(){
+	LogInInterface() {
 		setTitle("Log In");
 		setBounds(800,300,400,300);
 		
@@ -55,6 +56,12 @@ class logInInterface extends JFrame{
 		logIn_button.setBounds(250, 30, 80, 20);
 		getContentPane().add(logIn_button);
 		logIn_button.setVisible(true);
+		logIn_button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//Main m = new Main();
+			}
+			
+		});
 		
 		JTextField txt = new JTextField(" Text: "); 
 		txt.setEditable(false);
@@ -71,15 +78,4 @@ class logInInterface extends JFrame{
 	//	n.setVisible();
 		setVisible(true);
 	}
-	
-	
-
-}
-public class LogIn{
-	
-	public static void main(String[] args) {
-		new logInInterface();
-
-	}
-
-}
+}*/
