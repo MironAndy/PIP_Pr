@@ -14,7 +14,6 @@ import javax.swing.JTextField;
 public class GraphicsWindows {
 	public JFrame windows1 = new JFrame();
 	public JFrame windows2 = new JFrame();
-	
 	GraphicsWindows() {
 		initializeWindows1();
 	}
