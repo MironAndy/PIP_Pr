@@ -5,9 +5,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashMap;
 
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
@@ -55,13 +58,30 @@ public class GraphicsWindows {
 		});
 		
 		JButton logIn_button = new JButton("Log in"); 
+		JButton resetButton = new JButton("Reset");
 		logIn_button.setBounds(250, 30, 80, 20);
 		windows1.getContentPane().add(logIn_button);
 		logIn_button.setVisible(true);
+		resetButton.setVisible(false);
+		
+		
+		
+		
+		
 		logIn_button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String name=nickname.getText();
+				String pass=password.getText();
+				
+			if(name.equals("asd")) {// && pass.equals("123")) 
+				JOptionPane.showMessageDialog(null, "Login successful");
 				windows1.setVisible(false);
 				initializeWindows2();
+			}
+			else {
+				JOptionPane.showMessageDialog(null, "Nickname or Password incorrect");
+			}
+				
 			}
 			
 		});
