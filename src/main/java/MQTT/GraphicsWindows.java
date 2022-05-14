@@ -38,7 +38,7 @@ public class GraphicsWindows {
     String input;
     static int nrOfTopic = 0;
     int i = 70;
-    Preferences preferences;
+    Preferences preferences = Preferences.userNodeForPackage(GraphicsWindows.class);
 	GraphicsWindows() {
 		initializeWindows1();
 	}
@@ -141,8 +141,17 @@ public class GraphicsWindows {
 					mqttClient.connect(connOpts);
 					System.out.println("Connected");
 					
+					for (int k = 0; k <= preferences.getInt("countTopic", nrOfTopic); k++) {
+					JTextField t = new JTextField("", 100);
+					t.setBounds(260, i, 150, 20);
+					t.setText(preferences.get("user.name: " + k, input));
+					t.setVisible(true);
+					windows2.getContentPane().add(t);
+					i += 25;
+					}
+					
 				} catch (MqttException e1) {
-					e1.printStackTrace();
+					e1.printStackTrace();  
 				}
 			}
 		});
@@ -152,7 +161,13 @@ public class GraphicsWindows {
 		disconnect_button.setVisible(true);
 		disconnect_button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				b.disconnectedBroker(mqttClient);
+				//b.disconnectedBroker(mqttClient);
+				try {
+					mqttClient.disconnect();
+					System.out.println("Disconnected");
+				} catch (MqttException e1) {
+					e1.printStackTrace();
+				}
 			}
 		});
 		
@@ -177,19 +192,19 @@ public class GraphicsWindows {
 				int g = -1;
 				while (g < 0) {
 					String input = JOptionPane.showInputDialog("Topic");
-					preferences = Preferences.userNodeForPackage(GraphicsWindows.class);
-					preferences.put("user.name", input);
-					System.out.println(preferences.get("user.name", input));
+					preferences.put("user.name: " + nrOfTopic, input);
+					//System.out.println(preferences.get("user.name: " + k, input));
 					if (input.length() > 0) {
 						g++;
 						nrOfTopic++;
 						JTextField t = new JTextField("", 100);
 						t.setBounds(260, i, 150, 20);
-						t.setText(preferences.get("user.name", input));
+						t.setText(preferences.get("user.name: " + nrOfTopic, input));
 						t.setVisible(true);
 						windows2.getContentPane().add(t);
 						i += 25;
 					}
+					preferences.putInt("countTopic", nrOfTopic);
 				}
 			}
 			
