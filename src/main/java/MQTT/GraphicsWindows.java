@@ -36,7 +36,9 @@ public class GraphicsWindows {
     MemoryPersistence persistence = new MemoryPersistence();
     MqttClient mqttClient;
     String input;
-    
+    static int nrOfTopic = 0;
+    int i = 70;
+    Preferences preferences;
 	GraphicsWindows() {
 		initializeWindows1();
 	}
@@ -114,15 +116,12 @@ public class GraphicsWindows {
 		JTextField n = new JTextField(); 
 		n.setEditable(true);
 		n.setBounds(20,20,200,200);
-		windows2.getContentPane().add(n);
-		n.setVisible(true); 
+		//windows2.getContentPane().add(n);
+		//n.setVisible(true); 
 		//get add topic
 		
-		JTextField t = new JTextField("", 100);
-		t.setBounds(60, 60, 150, 30);
-		
 		JButton connect_button = new JButton("Connect");
-		connect_button.setBounds(350, 30,120, 20);
+		connect_button.setBounds(100, 30, 120, 20);
 		windows2.getContentPane().add(connect_button);
 		connect_button.setVisible(true);
 		connect_button.addActionListener(new ActionListener() {
@@ -148,7 +147,7 @@ public class GraphicsWindows {
 			}
 		});
 		JButton disconnect_button = new JButton("Disconnected");	
-		disconnect_button.setBounds(250, 200 ,120, 20);
+		disconnect_button.setBounds(230, 30 ,120, 20);
 		windows2.getContentPane().add(disconnect_button);
 		disconnect_button.setVisible(true);
 		disconnect_button.addActionListener(new ActionListener() {
@@ -158,7 +157,7 @@ public class GraphicsWindows {
 		});
 		
 		JButton logOut_button = new JButton("Log out"); 
-		logOut_button.setBounds(380, 200 ,120, 20);
+		logOut_button.setBounds(100, 230, 100, 20);
 		windows2.getContentPane().add(logOut_button);
 		logOut_button.setVisible(true);
 		logOut_button.addActionListener(new ActionListener() {
@@ -170,21 +169,26 @@ public class GraphicsWindows {
 		});
 		
 		JButton newTopic_button = new JButton("Add new topic "); 
-		newTopic_button.setBounds(250, 70, 110, 20);
+		newTopic_button.setBounds(100, 70, 150, 20);
 		windows2.getContentPane().add(newTopic_button);
 		newTopic_button.setVisible(true);
 		newTopic_button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int g = -1;
-				String[] topicText = null;
-				
 				while (g < 0) {
 					String input = JOptionPane.showInputDialog("Topic");
-					Preferences preferences = Preferences.userNodeForPackage(GraphicsWindows.class);
-					//preferences.put("user.name", input);
+					preferences = Preferences.userNodeForPackage(GraphicsWindows.class);
+					preferences.put("user.name", input);
 					System.out.println(preferences.get("user.name", input));
 					if (input.length() > 0) {
 						g++;
+						nrOfTopic++;
+						JTextField t = new JTextField("", 100);
+						t.setBounds(260, i, 150, 20);
+						t.setText(preferences.get("user.name", input));
+						t.setVisible(true);
+						windows2.getContentPane().add(t);
+						i += 25;
 					}
 				}
 			}
@@ -193,12 +197,12 @@ public class GraphicsWindows {
 		
 		JButton subscribedTopic_button = new JButton("Topic abonat. "); 
 		subscribedTopic_button.setBounds(250, 110, 130, 20);
-		windows2.getContentPane().add(subscribedTopic_button);
+		//windows2.getContentPane().add(subscribedTopic_button);
 		subscribedTopic_button.setVisible(true);
 		
 		
 		JButton write_button = new JButton("Publish"); 
-		write_button.setBounds(370, 70, 100, 20);
+		write_button.setBounds(100, 200, 100, 20);
 		windows2.getContentPane().add(write_button);
 		write_button.setVisible(true);
 		write_button.addActionListener(new ActionListener() {
@@ -224,7 +228,7 @@ public class GraphicsWindows {
 		
 		JButton read_button = new JButton("Read. "); 
 		read_button.setBounds(480, 70, 100, 20);
-		windows2.getContentPane().add(read_button);
+		//windows2.getContentPane().add(read_button);
 		read_button.setVisible(true);
 		read_button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -234,7 +238,7 @@ public class GraphicsWindows {
 		
 		JButton susbscribe_button = new JButton("Subscribe "); 
 		susbscribe_button.setBounds(590, 70, 100, 20);
-		windows2.getContentPane().add(susbscribe_button);
+		//windows2.getContentPane().add(susbscribe_button);
 		susbscribe_button.setVisible(true);
 		susbscribe_button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -250,7 +254,7 @@ public class GraphicsWindows {
 		
 		JButton unsusbscribe_button = new JButton("Unsubscribe. "); 
 		unsusbscribe_button.setBounds(390, 110, 130, 20);
-		windows2.getContentPane().add(unsusbscribe_button);
+		//windows2.getContentPane().add(unsusbscribe_button);
 		unsusbscribe_button.setVisible(true);
 		
 		JButton noName = new JButton("????"); 
