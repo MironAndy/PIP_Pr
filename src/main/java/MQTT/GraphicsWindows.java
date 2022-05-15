@@ -5,10 +5,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -34,6 +38,7 @@ public class GraphicsWindows {
     String txtTopic;
     static int nrOfTopic = 0;
     int i = 70;
+    List<String>topics= Arrays.asList("Sport","Catering","OteluGalati");
     Preferences preferences = Preferences.userNodeForPackage(GraphicsWindows.class);
 	GraphicsWindows() {
 		initializeWindows1();
@@ -130,7 +135,7 @@ public class GraphicsWindows {
 					//connOpts.setUserName(username);
 					//connOpts.setPassword(password.toCharArray());
 					connOpts.setAutomaticReconnect(true);
-					connOpts.setCleanSession(true);//Acesta va elimina mesajele netrimise dintr-o rulare anterioarã
+					connOpts.setCleanSession(true);//Acesta va elimina mesajele netrimise dintr-o rulare anterioara
 					connOpts.setConnectionTimeout(10);//Timpul de expirare a conexiunii este setat la 10 sec
 					System.out.println("Connecting to broker: " + broker);
 					
@@ -153,7 +158,7 @@ public class GraphicsWindows {
 				}
 			}
 		});
-		JButton newTopic_button = new JButton("Add new topic "); 
+		/*JButton newTopic_button = new JButton("Add new topic "); 
 		newTopic_button.setBounds(100, 70, 150, 20);
 		windows2.getContentPane().add(newTopic_button);
 		newTopic_button.setVisible(true);
@@ -174,7 +179,7 @@ public class GraphicsWindows {
 				preferences.putInt("countTopic", nrOfTopic);
 			}
 			
-		});
+		});*/
 		JButton disconnect_button = new JButton("Disconnected");	
 		disconnect_button.setBounds(230, 30 ,120, 20);
 		windows2.getContentPane().add(disconnect_button);
@@ -190,6 +195,18 @@ public class GraphicsWindows {
 				}
 			}
 		});
+		String[] topicuri= {"Sport","Catering","OteluGalati"};
+		 final JComboBox<String> topicBox = new JComboBox<>(topicuri);
+		 topicBox.setBounds(100, 70, 150, 20);
+	        windows2.getContentPane().add(topicBox);
+	        topicBox.addActionListener (new ActionListener () {
+	            public void actionPerformed(ActionEvent e) {
+	            	//daca nu exista fisierul creeaza-l
+	            	//daca exista:
+	            	//citeste din fisierul cu topicul nou selectat
+	                System.out.println(topicBox.getSelectedIndex());
+	            }
+	        });
 		
 		JButton logOut_button = new JButton("Log out"); 
 		logOut_button.setBounds(100, 230, 100, 20);
