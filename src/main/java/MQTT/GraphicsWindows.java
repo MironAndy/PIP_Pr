@@ -9,6 +9,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -21,6 +22,7 @@ import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 public class GraphicsWindows {
+	
 	public JFrame windows1 = new JFrame();
 	public JFrame windows2 = new JFrame();
 	ActionButton b = new ActionButton();
@@ -35,6 +37,7 @@ public class GraphicsWindows {
     static int nrOfTopic = 0;
     int i = 70;
     Preferences preferences = Preferences.userNodeForPackage(GraphicsWindows.class);
+    JTextField[] t = new JTextField[100];
 	GraphicsWindows() {
 		initializeWindows1();
 	}
@@ -137,14 +140,13 @@ public class GraphicsWindows {
 					mqttClient.connect(connOpts);
 					System.out.println("Connected");
 					// afisare aceasta doar cu un client deja existent
-					//preferences salveaza datele utilizatorului pentru a aminti ultimele valori din camp
 					nrOfTopic = preferences.getInt("countTopic", 0);
 					for (int k = 0; k <= nrOfTopic; k++) {
-						JTextField t = new JTextField("", 100);
-						t.setBounds(260, i, 150, 20);
-						t.setText(preferences.get("pswTopic" + k, txtTopic));
-						t.setVisible(true);
-						windows2.getContentPane().add(t);
+						t[k] = new JTextField("", 100);
+						t[k].setBounds(260, i, 150, 20);
+						t[k].setText(preferences.get("pswTopic" + k, ""));
+						t[k].setVisible(true);
+						windows2.getContentPane().add(t[k]);
 						i += 25;
 					}
 					
@@ -160,20 +162,58 @@ public class GraphicsWindows {
 		newTopic_button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				txtTopic = JOptionPane.showInputDialog("Topic");//scriu mesajul
+				
 				if (txtTopic.length() > 0) {
-					nrOfTopic++;
-					preferences.put("pswTopic" + nrOfTopic, txtTopic);//il pun intr un cod + nrOfTopic
-					JTextField t = new JTextField("", 100);
-					t.setBounds(260, i, 150, 20);
-					t.setText(preferences.get("pswTopic" + nrOfTopic, ""));
-					t.setVisible(true);
-					windows2.getContentPane().add(t);
+					preferences.put("pswTopic" + nrOfTopic, txtTopic);//il pun intr un cod + nrOfTopic					
+					t[nrOfTopic] = new JTextField();
+					t[nrOfTopic].setBounds(260, i, 150, 20);
+					t[nrOfTopic].setText(preferences.get("pswTopic" + nrOfTopic, ""));
+					windows2.getContentPane().add(t[nrOfTopic]);
 					i += 25;
-					System.out.println(nrOfTopic);
+					System.out.println(nrOfTopic+"aici");
+					nrOfTopic++;
+					preferences.putInt("countTopic", nrOfTopic);
 				}
-				preferences.putInt("countTopic", nrOfTopic);
 			}
 			
+		});
+		JLabel deleteTopic = new JLabel("Write what topic want to delete:");
+		deleteTopic.setBounds(420, 70, 200, 20);
+		windows2.getContentPane().add(deleteTopic);
+		final JTextField fieldTopicDelete = new JTextField();
+		fieldTopicDelete.setBounds(620, 70, 25, 20);
+		windows2.getContentPane().add(fieldTopicDelete);
+		JButton okDelete = new JButton("ok");
+		okDelete.setBounds(650, 70, 50, 20);
+		windows2.getContentPane().add(okDelete);
+		okDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean flag = false;
+				int indexTopicToDelete = Integer.parseInt(fieldTopicDelete.getText());
+				System.out.println(nrOfTopic);
+				if (preferences.getInt("countTopic", 0) < 0 || indexTopicToDelete <= 0 || indexTopicToDelete < nrOfTopic || !t[indexTopicToDelete-1].isVisible()) {
+					System.out.println("Nu aveti topic-uri de eliminat");
+				}
+				else {
+				//nrOfTopic = preferences.getInt("countTopic", 0);
+				//for (int i = 0; i <= nrOfTopic; i++) {
+					//if (i == indexTopicToDelete - 1) {
+				
+					t[indexTopicToDelete-1].setVisible(false);
+					for(int l = indexTopicToDelete-1; l < nrOfTopic - 1; l++) {
+						preferences.put("pswTopic" + l, t[l+1].getText());
+					}
+					nrOfTopic--;
+					if(nrOfTopic < 0)
+						nrOfTopic = 0;
+					preferences.putInt("countTopic", nrOfTopic);
+				
+						//flag = false;
+					//}
+				//}
+				}
+				
+			}
 		});
 		JButton disconnect_button = new JButton("Disconnected");	
 		disconnect_button.setBounds(230, 30 ,120, 20);
@@ -183,6 +223,7 @@ public class GraphicsWindows {
 			public void actionPerformed(ActionEvent e) {
 				//b.disconnectedBroker(mqttClient);
 				try {
+					
 					mqttClient.disconnect();
 					System.out.println("Disconnected");
 				} catch (MqttException e1) {
