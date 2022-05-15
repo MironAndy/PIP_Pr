@@ -5,18 +5,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Properties;
-import java.util.UUID;
 import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -35,7 +31,7 @@ public class GraphicsWindows {
     String clientId = "name1 Client";
     MemoryPersistence persistence = new MemoryPersistence();
     MqttClient mqttClient;
-    String input;
+    String txtTopic;
     static int nrOfTopic = 0;
     int i = 70;
     Preferences preferences = Preferences.userNodeForPackage(GraphicsWindows.class);
@@ -140,20 +136,44 @@ public class GraphicsWindows {
 					
 					mqttClient.connect(connOpts);
 					System.out.println("Connected");
-					
-					for (int k = 0; k <= preferences.getInt("countTopic", nrOfTopic); k++) {
-					JTextField t = new JTextField("", 100);
-					t.setBounds(260, i, 150, 20);
-					t.setText(preferences.get("user.name: " + k, input));
-					t.setVisible(true);
-					windows2.getContentPane().add(t);
-					i += 25;
+					// afisare aceasta doar cu un client deja existent
+					//preferences salveaza datele utilizatorului pentru a aminti ultimele valori din camp
+					nrOfTopic = preferences.getInt("countTopic", 0);
+					for (int k = 0; k <= nrOfTopic; k++) {
+						JTextField t = new JTextField("", 100);
+						t.setBounds(260, i, 150, 20);
+						t.setText(preferences.get("pswTopic" + k, txtTopic));
+						t.setVisible(true);
+						windows2.getContentPane().add(t);
+						i += 25;
 					}
 					
 				} catch (MqttException e1) {
 					e1.printStackTrace();  
 				}
 			}
+		});
+		JButton newTopic_button = new JButton("Add new topic "); 
+		newTopic_button.setBounds(100, 70, 150, 20);
+		windows2.getContentPane().add(newTopic_button);
+		newTopic_button.setVisible(true);
+		newTopic_button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				txtTopic = JOptionPane.showInputDialog("Topic");//scriu mesajul
+				if (txtTopic.length() > 0) {
+					nrOfTopic++;
+					preferences.put("pswTopic" + nrOfTopic, txtTopic);//il pun intr un cod + nrOfTopic
+					JTextField t = new JTextField("", 100);
+					t.setBounds(260, i, 150, 20);
+					t.setText(preferences.get("pswTopic" + nrOfTopic, ""));
+					t.setVisible(true);
+					windows2.getContentPane().add(t);
+					i += 25;
+					System.out.println(nrOfTopic);
+				}
+				preferences.putInt("countTopic", nrOfTopic);
+			}
+			
 		});
 		JButton disconnect_button = new JButton("Disconnected");	
 		disconnect_button.setBounds(230, 30 ,120, 20);
@@ -183,32 +203,6 @@ public class GraphicsWindows {
 			
 		});
 		
-		JButton newTopic_button = new JButton("Add new topic "); 
-		newTopic_button.setBounds(100, 70, 150, 20);
-		windows2.getContentPane().add(newTopic_button);
-		newTopic_button.setVisible(true);
-		newTopic_button.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int g = -1;
-				while (g < 0) {
-					String input = JOptionPane.showInputDialog("Topic");
-					preferences.put("user.name: " + nrOfTopic, input);
-					//System.out.println(preferences.get("user.name: " + k, input));
-					if (input.length() > 0) {
-						g++;
-						nrOfTopic++;
-						JTextField t = new JTextField("", 100);
-						t.setBounds(260, i, 150, 20);
-						t.setText(preferences.get("user.name: " + nrOfTopic, input));
-						t.setVisible(true);
-						windows2.getContentPane().add(t);
-						i += 25;
-					}
-					preferences.putInt("countTopic", nrOfTopic);
-				}
-			}
-			
-		});
 		
 		JButton subscribedTopic_button = new JButton("Topic abonat. "); 
 		subscribedTopic_button.setBounds(250, 110, 130, 20);
