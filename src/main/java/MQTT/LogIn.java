@@ -19,7 +19,7 @@ public class LogIn implements MqttCallback {
 
 	public void doDemo(String name) {
 	    try {
-	        client = new MqttClient("tcp://127.0.0.1:8081", name);
+	        client = new MqttClient("tcp://127.0.0.1:1883", name);
 	        client.connect();
 	        client.setCallback(this);
 	        client.subscribe("foo");
@@ -39,6 +39,10 @@ public class LogIn implements MqttCallback {
 	public void messageArrived(String topic, MqttMessage message)
 	        throws Exception {
 	 System.out.println(message);
+	 //adauga mesaj in fisierul care contine mesajele cu topicul respectiv
+	 
+	 //daca topic mesaj venit == topic mesaj selectat
+	 //adauga in textbox
 	}
 
 	public void deliveryComplete(IMqttDeliveryToken token) {

@@ -5,9 +5,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -36,6 +39,7 @@ public class GraphicsWindows {
     String txtTopic;
     static int nrOfTopic = 0;
     int i = 70;
+    List<String>topics= Arrays.asList("Sport","Catering","OteluGalati");
     Preferences preferences = Preferences.userNodeForPackage(GraphicsWindows.class);
     JTextField[] t = new JTextField[100];
 	GraphicsWindows() {
@@ -133,14 +137,14 @@ public class GraphicsWindows {
 					//connOpts.setUserName(username);
 					//connOpts.setPassword(password.toCharArray());
 					connOpts.setAutomaticReconnect(true);
-					connOpts.setCleanSession(true);//Acesta va elimina mesajele netrimise dintr-o rulare anterioarã
+					connOpts.setCleanSession(true);//Acesta va elimina mesajele netrimise dintr-o rulare anterioara
 					connOpts.setConnectionTimeout(10);//Timpul de expirare a conexiunii este setat la 10 sec
 					System.out.println("Connecting to broker: " + broker);
 					
 					mqttClient.connect(connOpts);
 					System.out.println("Connected");
 					// afisare aceasta doar cu un client deja existent
-					nrOfTopic = preferences.getInt("countTopic", 0);
+					/*nrOfTopic = preferences.getInt("countTopic", 0);
 					for (int k = 0; k <= nrOfTopic; k++) {
 						t[k] = new JTextField("", 100);
 						t[k].setBounds(260, i, 150, 20);
@@ -149,13 +153,13 @@ public class GraphicsWindows {
 						windows2.getContentPane().add(t[k]);
 						i += 25;
 					}
-					
+					*/
 				} catch (MqttException e1) {
 					e1.printStackTrace();  
 				}
 			}
 		});
-		JButton newTopic_button = new JButton("Add new topic "); 
+		/*JButton newTopic_button = new JButton("Add new topic "); 
 		newTopic_button.setBounds(100, 70, 150, 20);
 		windows2.getContentPane().add(newTopic_button);
 		newTopic_button.setVisible(true);
@@ -176,6 +180,7 @@ public class GraphicsWindows {
 				}
 			}
 			
+<<<<<<< HEAD
 		});
 		JLabel deleteTopic = new JLabel("Write what topic want to delete:");
 		deleteTopic.setBounds(420, 70, 200, 20);
@@ -215,6 +220,9 @@ public class GraphicsWindows {
 				
 			}
 		});
+=======
+		});*/
+//>>>>>>> 8b991f2db01d4e22e602f0e6603f67670bb58a3c
 		JButton disconnect_button = new JButton("Disconnected");	
 		disconnect_button.setBounds(230, 30 ,120, 20);
 		windows2.getContentPane().add(disconnect_button);
@@ -231,6 +239,18 @@ public class GraphicsWindows {
 				}
 			}
 		});
+		String[] topicuri= {"Sport","Catering","OteluGalati"};
+		 final JComboBox<String> topicBox = new JComboBox<String>(topicuri);
+		 topicBox.setBounds(100, 70, 150, 20);
+	        windows2.getContentPane().add(topicBox);
+	        topicBox.addActionListener (new ActionListener () {
+	            public void actionPerformed(ActionEvent e) {
+	            	//daca nu exista fisierul creeaza-l
+	            	//daca exista:
+	            	//citeste din fisierul cu topicul nou selectat
+	                System.out.println(topicBox.getSelectedIndex());
+	            }
+	        });
 		
 		JButton logOut_button = new JButton("Log out"); 
 		logOut_button.setBounds(100, 230, 100, 20);
