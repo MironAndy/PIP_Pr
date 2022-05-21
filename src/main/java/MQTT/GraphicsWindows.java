@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -272,7 +273,7 @@ public class GraphicsWindows {
 		});
 	}
 	
-	void initPublishButton(final JTextField fieldPublish,final JTextField fieldMessage,final JTextField textTopicAndMessages) {
+	void initPublishButton(final JTextField fieldPublish,final JTextField fieldMessage,final JTextField textTopicAndMessages, final JTextField MessageReader) {
 		
 		//Adaugarea butonului de publish si functionalitatea sa
 		JButton publish_button = new JButton("Publish"); 
@@ -306,6 +307,7 @@ public class GraphicsWindows {
 									e1.printStackTrace();
 								} 
 								textTopicAndMessages.setText("topic: '" + fieldPublish.getText() + " ' ," + " message: '" + message + " '");
+								MessageReader.setText("" + MessageReader.getText() + fieldMessage.getText());
 							//introducerea tuturor topicurilor intr un string
 							mesAndTop = new String[nrOfTopic];
 							for (int c = 0; c < nrOfTopic; c++) {
@@ -361,7 +363,7 @@ public class GraphicsWindows {
 		});
 		}
 	
-	void initSubscribeButton(final JTextField fieldPublish,final JTextField fielsubscribe) {
+	void initSubscribeButton(final JTextField fieldPublish,final JTextField fielsubscribe,final JTextField MessageReader) {
 		
 		//Crearea butonului de subscribe
 		JButton susbscribe_button = new JButton("Subscribe "); 
@@ -382,6 +384,9 @@ public class GraphicsWindows {
 							mqttClient.subscribe(fieldPublish.getText());
 							mqttClient.unsubscribe(fieldPublish.getText());
 							System.out.println("subscribe topic");
+							MessageReader.setText("");
+							//MessageReader.setLineWrap(true);
+							MessageReader.setVisible(true);
 						}
 					}
 				} catch (MqttException e1) {
@@ -424,12 +429,18 @@ public class GraphicsWindows {
 		fieldMessage.setBounds(350, 200, 130, 20);
 		windows2.getContentPane().add(fieldMessage);
 		
+		final JTextField MessageReader = new JTextField();
+		MessageReader.setBounds(450, 250, 330, 80);
+		MessageReader.setEditable(false);
+		MessageReader.setVisible(false);
+		windows2.getContentPane().add(MessageReader);
+		
 		final JTextField textTopicAndMessages = new JTextField();
         textTopicAndMessages.setBounds(620, 200, 180, 20);
         textTopicAndMessages.setEditable(false);
 		windows2.getContentPane().add(textTopicAndMessages);
 		
-		initPublishButton(fieldPublish,fieldMessage,textTopicAndMessages);		//apelarea si creearea butonului de pusblish
+		initPublishButton(fieldPublish,fieldMessage,textTopicAndMessages,MessageReader);		//apelarea si creearea butonului de pusblish
 		
 		initDisconnectButton();					//Creearea butonului de disconnect
 		
@@ -443,7 +454,7 @@ public class GraphicsWindows {
 		fielsubscribe.setBounds(100, 270, 130, 20);
 		windows2.getContentPane().add(fielsubscribe);
 		
-		initSubscribeButton(fieldPublish,fielsubscribe);		//creearea butonului de subscribe
+		initSubscribeButton(fieldPublish,fielsubscribe,MessageReader);		//creearea butonului de subscribe
 		
 		JButton unsusbscribe_button = new JButton("Unsubscribe "); 
 		unsusbscribe_button.setBounds(220, 250, 120, 20);
