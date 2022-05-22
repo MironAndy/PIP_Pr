@@ -9,24 +9,8 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 public class ActionButton {
     
-	void connectBroker(MqttClient mqttClient, String clientId,  MemoryPersistence persistence, String broker) {
-		try {
-			mqttClient = new MqttClient(broker, clientId, persistence);
-			MqttConnectOptions connOpts = new MqttConnectOptions();
-			connOpts.setCleanSession(true);
-			//connOpts.setUserName(username);
-			//connOpts.setPassword(password.toCharArray());*/
-			connOpts.setAutomaticReconnect(true);
-			connOpts.setCleanSession(true);//Acesta va elimina mesajele netrimise dintr-o rulare anterioarã
-			connOpts.setConnectionTimeout(10);//Timpul de expirare a conexiunii este setat la 10 sec
-			System.out.println("Connecting to broker: " + broker);
-			
-			mqttClient.connect(connOpts);
-			System.out.println("Connected");
-			
-		} catch (MqttException e1) {
-			e1.printStackTrace();
-		}
+	void connectBroker(MqttClient mqttClient, String clientId,  MemoryPersistence persistence, String broker, MqttConnectOptions connOpts) {
+		
 	}
 	void disconnectedBroker(MqttClient mqttClient) {
 		try {

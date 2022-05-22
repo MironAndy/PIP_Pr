@@ -16,6 +16,8 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -24,14 +26,14 @@ import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-public class GraphicsWindows {
+public class GraphicsWindows implements MqttCallback {
 	
 	//creearea celor 2 ferestrea care compun interfata
 	public JFrame windows1 = new JFrame("Log In");
 	public JFrame windows2 = new JFrame("Main Application");
 	
 	ActionButton b = new ActionButton();
-	String broker = "tcp://mqtt.eclipseprojects.io:1883";	//Adaugare brooker din cloud
+	String broker = "tcp://mqtt.eclipseprojects.io:1883";	//Adaugare brooker
     int qos = 0;
     
     //Declararea de variabile folosite in diverse functii
@@ -48,6 +50,7 @@ public class GraphicsWindows {
     JTextField[] t = new JTextField[100];
     JTextField nickname;
     JPasswordField password2;
+    JTextArea messagesBox;
     
 	GraphicsWindows() {
 		initializeWindows1();
@@ -113,6 +116,7 @@ public class GraphicsWindows {
 	}
 		
 	void initializeWindows1() {
+		
 		windows1.setLayout(null);
 		//Initialiazarea ferestrei de log In
 		windows1.setBounds(800,300,400,300);
@@ -150,31 +154,16 @@ public class GraphicsWindows {
 		//Conectarea propriu zisa la brooker prin intermediul connOpts la apasarea butonului
 		connect_button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//b.connectBroker(mqttClient, clientId, persistence, broker);
 				//verifica conectivitatea pentru a evita o reconectare nedorita
 				if (!isConnectedMqtt) {
 					try {
 						mqttClient.connect(connOpts);
-						System.out.println("mqttClient Connected");
-					} catch (MqttSecurityException e1) {
-						e1.printStackTrace();
+						System.out.println("Connected");
+						
 					} catch (MqttException e1) {
 						e1.printStackTrace();
 					}
 					isConnectedMqtt = true;
-					// afisare aceasta doar cu un client deja existent
-					nrOfTopic = preferences.getInt("countTopic", 0);
-					//Initializarea de topicuri din logarile anterioare
-					System.out.println("la apasarea butonului connect sunt " + nrOfTopic + " topicuri din conectarea anterioara.");
-					for (int k = 0; k <= nrOfTopic; k++) {
-						t[k] = new JTextField("", 100);
-						t[k].setBounds(260, i, 150, 20);
-						t[k].setText(preferences.get("pswTopic" + k, ""));
-						t[k].setVisible(true);
-						t[k].setEditable(false);
-						i += 25;
-						windows2.getContentPane().add(t[k]);
-					}
 				}
 			}
 		});
@@ -262,7 +251,7 @@ public class GraphicsWindows {
 		});
 	}
 	
-	void initPublishButton(final JTextField fieldPublish,final JTextField fieldMessage,final JTextField textTopicAndMessages, final JTextArea MessageReader) {
+	void initPublishButton(final JTextField fieldPublish,final JTextField fieldMessage,final JTextField textTopicAndMessages) {
 		
 		//Adaugarea butonului de publish si functionalitatea sa
 		JButton publish_button = new JButton("Publish"); 
@@ -271,43 +260,18 @@ public class GraphicsWindows {
 		publish_button.setVisible(true);
 		publish_button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
 				//mesaje pentru a ajuta proiectantul
-				System.out.println("nr topic la apasarea btn publish sunt : " + nrOfTopic + " topicuri ");
-				String[] mesAndTop = new String[nrOfTopic];
-				//if (mqttClient.isConnected()) {
-					if (nrOfTopic > 0) {
-						//parcurgerea topicurilor
-						for (int t = 0; t < nrOfTopic; t++) {
-							mesAndTop[t] = preferences.get("pswTopic" + t, "");
-							System.out.println(mesAndTop[t]);
-							System.out.println("topic nou: " + fieldPublish.getText() + " si topic dinainte: " +  mesAndTop[t]);
-							if (fieldPublish.getText().equals(mesAndTop[t])) {
-								message = new MqttMessage(fieldMessage.getText().getBytes());
-								message.setQos(qos);
-								message.setRetained(true); //seteaza mesajul retinut
-								System.out.println("messages is " + message);
-								try {
-									//message.setPayload("fieldMessage.getText()".getBytes());
-									mqttClient.publish(fieldMessage.getText(), message);
-									System.out.println("Message published");
-								} catch (MqttPersistenceException e1) {
-									e1.printStackTrace();
-								} catch (MqttException e1) {
-									e1.printStackTrace();
-								} 
-								textTopicAndMessages.setText("topic: '" + fieldPublish.getText() + " ' ," + " message: '" + message + " '");
-								MessageReader.setText("" + MessageReader.getText() + fieldMessage.getText()+"\r\n");
-							//introducerea tuturor topicurilor intr un string
-							mesAndTop = new String[nrOfTopic];
-							for (int c = 0; c < nrOfTopic; c++) {
-								mesAndTop[c] = preferences.get("pswTopic" + c, "");
-								System.out.println(mesAndTop[c]);
-								//textTopicAndMessages.insert("topic: '" + txtTopic + " ' ," + " message: '" + message + "'", nrOfRows);
-								//nrOfRows++;
-							}
-					}
-						}
-					//}
+				MqttMessage message = new MqttMessage(fieldPublish.getText().getBytes());
+		        message.setQos(qos);
+		        message.setRetained(true); //sets retained message 
+		        try {
+		        	mqttClient.publish("topic", message);
+		        	System.out.println("published" + message.getPayload());
+				} catch (MqttPersistenceException e1) {
+					e1.printStackTrace();
+				} catch (MqttException e1) {
+					e1.printStackTrace();
 				}
 			}
 		});
@@ -352,7 +316,7 @@ public class GraphicsWindows {
 		});
 		}
 	
-	void initSubscribeButton(final JTextField fieldPublish,final JTextField fielsubscribe,final JTextArea MessageReader) {
+	void initSubscribeButton(final JTextField fieldPublish,final JTextField fielsubscribe) {
 		
 		//Crearea butonului de subscribe
 		JButton susbscribe_button = new JButton("Subscribe "); 
@@ -364,20 +328,7 @@ public class GraphicsWindows {
 			public void actionPerformed(ActionEvent e) {
 				String[] messSubscribe = new String[nrOfTopic];
 				try {
-					for (int t = 0; t < nrOfTopic; t++) { // parcurgeti topicurile
-						messSubscribe[t] = preferences.get("pswTopic" + t, "");
-						System.out.println(messSubscribe[t]);
-						System.out.println("topic nou: " + fieldPublish.getText() + " si topic dinainte: " +  messSubscribe[t]);
-						if (fielsubscribe.getText().equals(messSubscribe[t])) {
-							//mqttClient.setCallback(this);
-							mqttClient.subscribe(fieldPublish.getText());
-							mqttClient.unsubscribe(fieldPublish.getText());
-							System.out.println("subscribe topic");
-							MessageReader.setText("");
-							MessageReader.setLineWrap(true);
-							MessageReader.setVisible(true);
-						}
-					}
+					mqttClient.subscribe("topic");
 				} catch (MqttException e1) {
 					e1.printStackTrace();
 				}
@@ -420,18 +371,18 @@ public class GraphicsWindows {
 		fieldMessage.setBounds(350, 200, 130, 20);
 		windows2.getContentPane().add(fieldMessage);
 		
-		final JTextArea MessageReader = new JTextArea();
-		MessageReader.setBounds(450, 250, 330, 80);
-		MessageReader.setEditable(false);
-		MessageReader.setVisible(false);
-		windows2.getContentPane().add(MessageReader);
+		messagesBox = new JTextArea();
+		messagesBox.setBounds(450, 250, 330, 80);
+		messagesBox.setEditable(false);
+		messagesBox.setVisible(true);
+		windows2.getContentPane().add(messagesBox);
 		
 		final JTextField textTopicAndMessages = new JTextField();
         textTopicAndMessages.setBounds(620, 200, 180, 20);
         textTopicAndMessages.setEditable(false);
 		windows2.getContentPane().add(textTopicAndMessages);
 		
-		initPublishButton(fieldPublish,fieldMessage,textTopicAndMessages,MessageReader);		//apelarea si creearea butonului de pusblish
+		initPublishButton(fieldPublish,fieldMessage,textTopicAndMessages);		//apelarea si creearea butonului de pusblish
 		
 		initDisconnectButton();					//Creearea butonului de disconnect
 		
@@ -445,7 +396,7 @@ public class GraphicsWindows {
 		fielsubscribe.setBounds(100, 270, 130, 20);
 		windows2.getContentPane().add(fielsubscribe);
 		
-		initSubscribeButton(fieldPublish,fielsubscribe,MessageReader);		//creearea butonului de subscribe
+		initSubscribeButton(fieldPublish,fielsubscribe);		//creearea butonului de subscribe
 		
 		JButton unsusbscribe_button = new JButton("Unsubscribe "); 
 		unsusbscribe_button.setBounds(220, 250, 120, 20);
@@ -461,5 +412,20 @@ public class GraphicsWindows {
 		} catch (MqttException e1) {
 			e1.printStackTrace();  
 		}
+	}
+
+	public void connectionLost(Throwable cause) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void messageArrived(String topic, MqttMessage message) throws Exception {
+		
+		messagesBox.append(message.toString());
+	}
+
+	public void deliveryComplete(IMqttDeliveryToken token) {
+		// TODO Auto-generated method stub
+		
 	}
 }

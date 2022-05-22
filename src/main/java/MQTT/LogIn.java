@@ -38,7 +38,7 @@ public class LogIn implements MqttCallback {
 
 	public void messageArrived(String topic, MqttMessage message)
 	        throws Exception {
-	 System.out.println(message);
+	 System.out.println("DDSGDSGSDGSD " + message);
 	 //adauga mesaj in fisierul care contine mesajele cu topicul respectiv
 	 
 	 //daca topic mesaj venit == topic mesaj selectat
