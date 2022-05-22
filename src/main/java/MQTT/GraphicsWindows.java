@@ -111,19 +111,9 @@ public class GraphicsWindows {
 		});
 		windows1.getContentPane().add(logIn_button);
 	}
-	
-	void initSmecherie() {
 		
-		//Rezolvarea unui bug de care sper ca nu vom fi intrebati
-		JTextField txt = new JTextField(" Text: "); 
-		txt.setEditable(false);
-		txt.setBounds(60,100,100,20);
-		windows1.getContentPane().add(txt);
-		txt.setVisible(false);
-	}
-	
 	void initializeWindows1() {
-		
+		windows1.setLayout(null);
 		//Initialiazarea ferestrei de log In
 		windows1.setBounds(800,300,400,300);
 		windows1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -132,7 +122,6 @@ public class GraphicsWindows {
 		initNickname();			//apelul funtciei care creeaza campul nickname
 		initPasswordButton();	//apelul funtciei care creeaza campul password
 		initLoginButton();		//apelul funtciei care creeaza butonul de log in
-		initSmecherie();		//apelul funtciei care rezolva un bug
 		
 		windows1.setVisible(true);
 	}
@@ -273,7 +262,7 @@ public class GraphicsWindows {
 		});
 	}
 	
-	void initPublishButton(final JTextField fieldPublish,final JTextField fieldMessage,final JTextField textTopicAndMessages, final JTextField MessageReader) {
+	void initPublishButton(final JTextField fieldPublish,final JTextField fieldMessage,final JTextField textTopicAndMessages, final JTextArea MessageReader) {
 		
 		//Adaugarea butonului de publish si functionalitatea sa
 		JButton publish_button = new JButton("Publish"); 
@@ -307,7 +296,7 @@ public class GraphicsWindows {
 									e1.printStackTrace();
 								} 
 								textTopicAndMessages.setText("topic: '" + fieldPublish.getText() + " ' ," + " message: '" + message + " '");
-								MessageReader.setText("" + MessageReader.getText() + fieldMessage.getText());
+								MessageReader.setText("" + MessageReader.getText() + fieldMessage.getText()+"\r\n");
 							//introducerea tuturor topicurilor intr un string
 							mesAndTop = new String[nrOfTopic];
 							for (int c = 0; c < nrOfTopic; c++) {
@@ -363,7 +352,7 @@ public class GraphicsWindows {
 		});
 		}
 	
-	void initSubscribeButton(final JTextField fieldPublish,final JTextField fielsubscribe,final JTextField MessageReader) {
+	void initSubscribeButton(final JTextField fieldPublish,final JTextField fielsubscribe,final JTextArea MessageReader) {
 		
 		//Crearea butonului de subscribe
 		JButton susbscribe_button = new JButton("Subscribe "); 
@@ -385,7 +374,7 @@ public class GraphicsWindows {
 							mqttClient.unsubscribe(fieldPublish.getText());
 							System.out.println("subscribe topic");
 							MessageReader.setText("");
-							//MessageReader.setLineWrap(true);
+							MessageReader.setLineWrap(true);
 							MessageReader.setVisible(true);
 						}
 					}
@@ -397,6 +386,8 @@ public class GraphicsWindows {
 	}
 	
 	void initializeWindows2() {
+		
+		windows2.setLayout(null);
 		//Creearea celei de-a 2 ferestre a interfetei si apelarea functiilor specifice acesteia
 		try {
 			mqttClient = new MqttClient(broker, nickname.getText(), persistence);
@@ -429,7 +420,7 @@ public class GraphicsWindows {
 		fieldMessage.setBounds(350, 200, 130, 20);
 		windows2.getContentPane().add(fieldMessage);
 		
-		final JTextField MessageReader = new JTextField();
+		final JTextArea MessageReader = new JTextArea();
 		MessageReader.setBounds(450, 250, 330, 80);
 		MessageReader.setEditable(false);
 		MessageReader.setVisible(false);
