@@ -17,6 +17,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -141,7 +142,7 @@ public class GraphicsWindows implements MqttCallback {
 		connOpts.setAutomaticReconnect(true);	//Biblioteca va incerca automat sa se reconnecteze la server in cazul unei defectiuni in retea
 		connOpts.setCleanSession(true);			//Acesta va elimina mesajele netrimise dintr-o rulare anterioara
 		connOpts.setConnectionTimeout(100);		//Timpul de expirare a conexiunii este setat la 100 secunde
-		
+
 		return connOpts;			
 	}
 	
@@ -262,7 +263,7 @@ public class GraphicsWindows implements MqttCallback {
 			public void actionPerformed(ActionEvent e) {
 				
 				//mesaje pentru a ajuta proiectantul
-				MqttMessage message = new MqttMessage(fieldPublish.getText().getBytes());
+				MqttMessage message = new MqttMessage(fieldMessage.getText().getBytes());
 		        message.setQos(qos);
 		        message.setRetained(true); //sets retained message 
 		        try {
@@ -341,7 +342,8 @@ public class GraphicsWindows implements MqttCallback {
 		windows2.setLayout(null);
 		//Creearea celei de-a 2 ferestre a interfetei si apelarea functiilor specifice acesteia
 		try {
-			mqttClient = new MqttClient(broker, nickname.getText(), persistence);
+			mqttClient = new MqttClient(broker, MqttAsyncClient.generateClientId(), persistence);
+			mqttClient.setCallback(this);
 			
 			final MqttConnectOptions connOpts = initConnectionOptions();
 			
@@ -416,12 +418,13 @@ public class GraphicsWindows implements MqttCallback {
 
 	public void connectionLost(Throwable cause) {
 		// TODO Auto-generated method stub
-		
+		isConnectedMqtt = false;
 	}
 
 	public void messageArrived(String topic, MqttMessage message) throws Exception {
 		
-		messagesBox.append(message.toString());
+		
+		messagesBox.append(message.toString() + "\r\n");
 	}
 
 	public void deliveryComplete(IMqttDeliveryToken token) {
