@@ -38,7 +38,7 @@ public class GraphicsWindows implements MqttCallback {
     int qos = 0;
     
     //Declararea de variabile folosite in diverse functii
-    //String clientId = "name1 Client";
+    
     MemoryPersistence persistence = new MemoryPersistence();
     MqttClient mqttClient;
     String txtTopic;
@@ -137,7 +137,7 @@ public class GraphicsWindows implements MqttCallback {
 		MqttConnectOptions connOpts = new MqttConnectOptions();		//creearea variabilei connOpts care va fi utila mai tarziu
 		connOpts.setCleanSession(true);
 		connOpts.setUserName(nickname.getText());
-		connOpts.setPassword(password2.getPassword());//toCharArray());
+		connOpts.setPassword(password2.getPassword());				//toCharArray());
 		
 		connOpts.setAutomaticReconnect(true);	//Biblioteca va incerca automat sa se reconnecteze la server in cazul unei defectiuni in retea
 		connOpts.setCleanSession(true);			//Acesta va elimina mesajele netrimise dintr-o rulare anterioara
@@ -157,6 +157,7 @@ public class GraphicsWindows implements MqttCallback {
 			public void actionPerformed(ActionEvent e) {
 				//verifica conectivitatea pentru a evita o reconectare nedorita
 				if (!isConnectedMqtt) {
+					//verifiacrea conectivitatii se face printr-o exceptie
 					try {
 						mqttClient.connect(connOpts);
 						System.out.println("Connected");
@@ -173,7 +174,7 @@ public class GraphicsWindows implements MqttCallback {
 	
 	void initNewTopicButton() {
 		
-		//Crearea butonului care va dauga topicuri noi
+		//Crearea butonului care va adauga topicuri noi
 		JButton newTopic_button = new JButton("Add new topic "); 
 		newTopic_button.setBounds(100, 70, 150, 20);
 		windows2.getContentPane().add(newTopic_button);
@@ -214,10 +215,13 @@ public class GraphicsWindows implements MqttCallback {
 		deleteTopic.setBounds(420, 70, 200, 20);
 		windows2.getContentPane().add(deleteTopic);
 		
+		//initializarea TextField-ului care va prelua informatia introdusa de utilizator
+		//si o va compara cu indexul topicului
 		final JTextField fieldTopicDelete = new JTextField();
 		fieldTopicDelete.setBounds(620, 70, 25, 20);
 		windows2.getContentPane().add(fieldTopicDelete);
 		
+		//butonul care verifica daca utilizatorul e de acord
 		JButton okDelete = new JButton("ok");
 		okDelete.setBounds(650, 70, 50, 20);
 		windows2.getContentPane().add(okDelete);
@@ -265,10 +269,10 @@ public class GraphicsWindows implements MqttCallback {
 				//mesaje pentru a ajuta proiectantul
 				MqttMessage message = new MqttMessage(fieldMessage.getText().getBytes());
 		        message.setQos(qos);
-		        message.setRetained(true); //sets retained message 
+		        message.setRetained(true);		//va afisa ultimul mesaj introdus in utilizarea anterioara
 		        try {
-		        	mqttClient.publish("topic", message);
-		        	System.out.println("published" + message.getPayload());
+		        	mqttClient.publish("topic", message);						//legatura de functionalitate a brokerului intre metodele
+		        	System.out.println("published" + message.getPayload());		//publish si subscriber
 				} catch (MqttPersistenceException e1) {
 					e1.printStackTrace();
 				} catch (MqttException e1) {
@@ -329,7 +333,7 @@ public class GraphicsWindows implements MqttCallback {
 			public void actionPerformed(ActionEvent e) {
 				String[] messSubscribe = new String[nrOfTopic];
 				try {
-					mqttClient.subscribe("topic");
+					mqttClient.subscribe("topic");		//continuarea legaturii inceputa la publish
 				} catch (MqttException e1) {
 					e1.printStackTrace();
 				}
@@ -342,13 +346,14 @@ public class GraphicsWindows implements MqttCallback {
 		windows2.setLayout(null);
 		//Creearea celei de-a 2 ferestre a interfetei si apelarea functiilor specifice acesteia
 		try {
+			//apelarea functiei de legatura dintre metode si asigurarea de izolare a unui eveniment de deconectare brusca
 			mqttClient = new MqttClient(broker, MqttAsyncClient.generateClientId(), persistence);
 			mqttClient.setCallback(this);
 			
 			final MqttConnectOptions connOpts = initConnectionOptions();
 			
 			System.out.println("Connecting to broker: " + broker);
-			
+			//definirea ferestrei generale a aplicatiei
 			windows2.setBounds(800,300,900,400);
 			windows2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			windows2.getContentPane().setBackground((new Color(100,200,225)));
@@ -417,18 +422,20 @@ public class GraphicsWindows implements MqttCallback {
 	}
 
 	public void connectionLost(Throwable cause) {
-		// TODO Auto-generated method stub
-		isConnectedMqtt = false;
+		// TODO Auto-generated method stub 
+		isConnectedMqtt = false;		//deconectarea in cazul unei erori,pentru a permite reconectarea clientului 
+										//prin apasarea butonului de connect
 	}
 
 	public void messageArrived(String topic, MqttMessage message) throws Exception {
 		
-		
+		//functia care transmite mesajele intre clienti si le alinieaza pe randuri separate
 		messagesBox.append(message.toString() + "\r\n");
 	}
 
 	public void deliveryComplete(IMqttDeliveryToken token) {
 		// TODO Auto-generated method stub
+		System.out.println("Mesaj trimis");
 		
 	}
 }
