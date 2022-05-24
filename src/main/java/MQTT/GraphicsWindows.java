@@ -27,6 +27,7 @@ import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+//Clasa de baza a proiectului care implementeaza clasa brooker-ului
 public class GraphicsWindows implements MqttCallback {
 	
 	//creearea celor 2 ferestrea care compun interfata
@@ -34,7 +35,7 @@ public class GraphicsWindows implements MqttCallback {
 	public JFrame windows2 = new JFrame("Main Application");
 	
 	ActionButton b = new ActionButton();
-	String broker = "tcp://mqtt.eclipseprojects.io:1883";	//Adaugare brooker
+	String broker = "tcp://mqtt.eclipseprojects.io:1883";	//Adaugare brooker pe pinul predefinit
     int qos = 0;
     
     //Declararea de variabile folosite in diverse functii
@@ -172,7 +173,7 @@ public class GraphicsWindows implements MqttCallback {
 		windows2.getContentPane().add(connect_button);
 	}
 	
-	void initNewTopicButton() {
+/*	void initNewTopicButton() {
 		
 		//Crearea butonului care va adauga topicuri noi
 		JButton newTopic_button = new JButton("Add new topic "); 
@@ -206,9 +207,9 @@ public class GraphicsWindows implements MqttCallback {
 				}
 			}
 		});
-	}
+	}*/
 	
-	void initDeleteElements() {
+	/*void initDeleteElements() {
 		
 		//Crearea sistemmului care sterge un topic care nu mai prezinta interes pentru client
 		JLabel deleteTopic = new JLabel("Write what topic want to delete:");
@@ -254,31 +255,30 @@ public class GraphicsWindows implements MqttCallback {
 				}
 			}
 		});
-	}
+	}*/
 	
-	void initPublishButton(final JTextField fieldPublish,final JTextField fieldMessage,final JTextField textTopicAndMessages) {
+	void initPublishButton(final JTextField fieldPublish,final JTextField fieldMessage,final JTextField fielsubscribe) {
 		
 		//Adaugarea butonului de publish si functionalitatea sa
 		JButton publish_button = new JButton("Publish"); 
-		publish_button.setBounds(500, 200, 100, 20);
+		publish_button.setBounds(500, 90, 100, 20);
 		windows2.getContentPane().add(publish_button);
 		publish_button.setVisible(true);
 		publish_button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				//mesaje pentru a ajuta proiectantul
 				MqttMessage message = new MqttMessage(fieldMessage.getText().getBytes());
 		        message.setQos(qos);
 		        message.setRetained(true);		//va afisa ultimul mesaj introdus in utilizarea anterioara
 		        try {
-		        	mqttClient.publish("topic", message);						//legatura de functionalitate a brokerului intre metodele
-		        	System.out.println("published" + message.getPayload());		//publish si subscriber
+		        	mqttClient.publish(fieldPublish.getText(), message);					//legatura de functionalitate a brokerului intre metodele
+		        	System.out.println("published" + message.getPayload());			//publish si subscriber
 				} catch (MqttPersistenceException e1) {
 					e1.printStackTrace();
 				} catch (MqttException e1) {
 					e1.printStackTrace();
 				}
-			}
+				}
+			
 		});
 	}
 	
@@ -308,7 +308,7 @@ public class GraphicsWindows implements MqttCallback {
 		
 		//Creearea butonului de log out care va face trecerea intre interfete
 		JButton logOut_button = new JButton("Log out"); 
-		logOut_button.setBounds(100, 310, 100, 20);
+		logOut_button.setBounds(760, 30, 100, 20);
 		windows2.getContentPane().add(logOut_button);
 		logOut_button.setVisible(true);
 		//Implementarea tranzitiei
@@ -325,18 +325,36 @@ public class GraphicsWindows implements MqttCallback {
 		
 		//Crearea butonului de subscribe
 		JButton susbscribe_button = new JButton("Subscribe "); 
-		susbscribe_button.setBounds(270, 270, 100, 20);
+		susbscribe_button.setBounds(270, 270, 120, 20);
 		windows2.getContentPane().add(susbscribe_button);
 		susbscribe_button.setVisible(true);
 		//implementarea functionalitatii butonului ajuntandu-ne de functiile definite in clasa subscriber
 		susbscribe_button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String[] messSubscribe = new String[nrOfTopic];
+				if (isConnectedMqtt == true)
+					{messagesBox.setVisible(true);}
+				
 				try {
-					mqttClient.subscribe("topic");		//continuarea legaturii inceputa la publish
+					mqttClient.subscribe(fielsubscribe.getText());		//continuarea legaturii inceputa la publish
 				} catch (MqttException e1) {
 					e1.printStackTrace();
 				}
+			}
+		});
+	}
+	
+	void initUnsubscribeButton() {
+		JButton unsusbscribe_button = new JButton("Unsubscribe "); 
+		unsusbscribe_button.setBounds(270, 300, 120, 20);
+		windows2.getContentPane().add(unsusbscribe_button);
+		unsusbscribe_button.setVisible(true);
+		unsusbscribe_button.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				messagesBox.setVisible(false);
+				try {
+					mqttClient.unsubscribe("topic");
+				}catch(MqttException e2) {
+					e2.printStackTrace();				}
 			}
 		});
 	}
@@ -359,42 +377,30 @@ public class GraphicsWindows implements MqttCallback {
 			windows2.getContentPane().setBackground((new Color(100,200,225)));
 		
 			initConnectButton(connOpts);			//apelarea functiei de connectarea
-			initNewTopicButton();					//apelarea functiei care creea butonul de adaugarae de topicuri
-			initDeleteElements();					//apelarea functiei care sterge un element
+			//initNewTopicButton();					//apelarea functiei care creea butonul de adaugarae de topicuri
+			//initDeleteElements();					//apelarea functiei care sterge un element
 			
-		JLabel publishTopic = new JLabel("If you want to publish choose a topic:");
-		publishTopic.setBounds(100, 180, 220, 20);
+		JLabel publishTopic = new JLabel("Write topic to publish in:");
+		publishTopic.setBounds(100, 70, 220, 20);
 		windows2.getContentPane().add(publishTopic);
 		
 		final JTextField fieldPublish = new JTextField();
-		fieldPublish.setBounds(100, 200, 130, 20);
+		fieldPublish.setBounds(100, 90, 130, 20);
 		windows2.getContentPane().add(fieldPublish);
 		
 		JLabel publishMessage = new JLabel("Write message: ");
-		publishMessage.setBounds(350, 180, 150, 20);
+		publishMessage.setBounds(350, 70, 150, 20);
 		windows2.getContentPane().add(publishMessage);
 		
 		final JTextField fieldMessage = new JTextField();
-		fieldMessage.setBounds(350, 200, 130, 20);
+		fieldMessage.setBounds(350, 90, 130, 20);
 		windows2.getContentPane().add(fieldMessage);
 		
 		messagesBox = new JTextArea();
-		messagesBox.setBounds(450, 250, 330, 80);
+		messagesBox.setBounds(450, 150, 360, 200);
 		messagesBox.setEditable(false);
-		messagesBox.setVisible(true);
+		messagesBox.setVisible(false);
 		windows2.getContentPane().add(messagesBox);
-		
-		final JTextField textTopicAndMessages = new JTextField();
-        textTopicAndMessages.setBounds(620, 200, 180, 20);
-        textTopicAndMessages.setEditable(false);
-		windows2.getContentPane().add(textTopicAndMessages);
-		
-		initPublishButton(fieldPublish,fieldMessage,textTopicAndMessages);		//apelarea si creearea butonului de pusblish
-		
-		initDisconnectButton();					//Creearea butonului de disconnect
-		
-		initLog_outButton();					// Creearea butonului de log_out
-				
 		JLabel subscribeMessage = new JLabel("Write topic to subscribe: ");
 		subscribeMessage .setBounds(100, 250, 220, 20);
 		windows2.getContentPane().add(subscribeMessage);
@@ -403,18 +409,16 @@ public class GraphicsWindows implements MqttCallback {
 		fielsubscribe.setBounds(100, 270, 130, 20);
 		windows2.getContentPane().add(fielsubscribe);
 		
+		initPublishButton(fieldPublish,fieldMessage,fielsubscribe);		//apelarea si creearea butonului de pusblish
+		
+		initDisconnectButton();					//Creearea butonului de disconnect
+		
+		initLog_outButton();					// Creearea butonului de log_out
+						
 		initSubscribeButton(fieldPublish,fielsubscribe);		//creearea butonului de subscribe
 		
-		JButton unsusbscribe_button = new JButton("Unsubscribe "); 
-		unsusbscribe_button.setBounds(220, 250, 120, 20);
-		//windows2.getContentPane().add(unsusbscribe_button);
-		unsusbscribe_button.setVisible(true);
-		
-		JButton noName = new JButton("????"); 
-		noName.setBounds(390, 110, 100, 20);
-		windows2.getContentPane().add(noName);
-		noName.setVisible(false);
-		
+		initUnsubscribeButton();				//creearea butonului de unsubscribe
+				
 		windows2.setVisible(true);
 		} catch (MqttException e1) {
 			e1.printStackTrace();  
