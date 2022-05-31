@@ -138,7 +138,7 @@ public class GraphicsWindows implements MqttCallback {
 		MqttConnectOptions connOpts = new MqttConnectOptions();		//creearea variabilei connOpts care va fi utila mai tarziu
 		connOpts.setCleanSession(true);
 		connOpts.setUserName(nickname.getText());
-		connOpts.setPassword(password2.getPassword());				//toCharArray());
+		connOpts.setPassword(password2.getPassword());				
 		
 		connOpts.setAutomaticReconnect(true);	//Biblioteca va incerca automat sa se reconnecteze la server in cazul unei defectiuni in retea
 		connOpts.setCleanSession(true);			//Acesta va elimina mesajele netrimise dintr-o rulare anterioara
@@ -343,16 +343,19 @@ public class GraphicsWindows implements MqttCallback {
 		});
 	}
 	
-	void initUnsubscribeButton() {
+	void initUnsubscribeButton(final JTextField fielsubscribe) {
+		
+		//Creearea butonului de unsubscribe
 		JButton unsusbscribe_button = new JButton("Unsubscribe "); 
 		unsusbscribe_button.setBounds(270, 300, 120, 20);
 		windows2.getContentPane().add(unsusbscribe_button);
 		unsusbscribe_button.setVisible(true);
+		//implementarea functionalitatii de unsubscribe
 		unsusbscribe_button.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				messagesBox.setVisible(false);
 				try {
-					mqttClient.unsubscribe("topic");
+					mqttClient.unsubscribe(fielsubscribe.getText());
 				}catch(MqttException e2) {
 					e2.printStackTrace();				}
 			}
@@ -417,7 +420,7 @@ public class GraphicsWindows implements MqttCallback {
 						
 		initSubscribeButton(fieldPublish,fielsubscribe);		//creearea butonului de subscribe
 		
-		initUnsubscribeButton();				//creearea butonului de unsubscribe
+		initUnsubscribeButton(fielsubscribe);				//creearea butonului de unsubscribe
 				
 		windows2.setVisible(true);
 		} catch (MqttException e1) {
